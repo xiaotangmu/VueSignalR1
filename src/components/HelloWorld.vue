@@ -20,6 +20,7 @@
       <input v-model="groupName" type="text" />
       <button @click="joinGroup">加入组</button>
       <button @click="levelGroup">离开组</button>
+      <button @click="close">断开连接</button>
     </div>
     <div>
       <ul v-for="(item ,index) in messages" v-bind:key="index +'itemMessage'">
@@ -134,6 +135,14 @@
             return console.error(err);
           });
       },
+      close() {
+        console.log('I am close');
+        this.connection
+          .invoke("Close")
+          .catch(function (err) {
+            return console.error(err);
+          });
+      },
       // 离开组
       levelGroup() {
         this.connection
@@ -163,7 +172,11 @@
           thisVue.messages.push({user, message});
           console.log({user, message});
         });
-        this.connection.start();
+        // this.connection.start({ pingInterval: 300000 }); // 心跳时间，单位毫秒，默认五分钟
+        this.connection.start(); // 默认不操作，自动断开时间，单位毫秒
+        this.connection.onclose((error) => {
+          console.log('连接已关闭');
+        });
       },
     }
   }
